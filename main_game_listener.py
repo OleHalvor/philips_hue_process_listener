@@ -105,20 +105,29 @@ while True:
             if "color_temperature" in highest_priority_app:
                 last_set_temperature = highest_priority_app["color_temperature"]
                 setColorTemperature(highest_priority_app["color_temperature"])
+            else:
+                last_set_temperature = base_temperature
+                setColorTemperature(base_temperature)
             if "brightness" in highest_priority_app:
                 last_set_brightness = highest_priority_app["brightness"]
                 setBrightness(highest_priority_app["brightness"])
+            else:
+                print("setting base brightness",base_brightness)
+                last_set_brightness = base_brightness
+                setBrightness(base_brightness)
             current_app = highest_priority_app
             print("new priority app", highest_priority_app)
         else:
             if current_app == highest_priority_app:
                 if "color_temperature" in highest_priority_app and not get_current_temperature() == highest_priority_app["color_temperature"]:
-                    print("external temperature detected, saving new base value")
+                    time.sleep(1)
+                    print("external temperature detected, saving new base value",get_current_temperature())
                     base_temperature = get_current_temperature()
                     base_brightness = get_current_brightness()
                 if "brightness" in highest_priority_app and not get_current_brightness() == highest_priority_app["brightness"]:
+                    time.sleep(1)
                     # Not a new app, but missmatch of brightness
-                    print("external brightness detected, saving new base value")
+                    print("external brightness detected, saving new base value",get_current_brightness())
                     base_brightness = get_current_brightness()
     elif not current_app == "base":
         print("setting base")
@@ -129,10 +138,12 @@ while True:
         current_app = "base"
 
     if len(found_apps) == 0 and last_set_brightness == base_brightness and not get_current_brightness() == last_set_brightness:
-        print("external brightness detected, saving new base value")
+        time.sleep(1)
+        print("external brightness detected, saving new base value",get_current_brightness())
         base_brightness = get_current_brightness()
     if len(found_apps) == 0 and last_set_temperature == base_temperature and not get_current_temperature() == last_set_temperature:
-        print("external temperature detected, saving new base value")
+        time.sleep(1)
+        print("external temperature detected, saving new base value",get_current_temperature())
         base_temperature = get_current_temperature()
 
     time.sleep(1)
