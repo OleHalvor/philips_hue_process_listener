@@ -6,7 +6,6 @@ programs = []
 p = {}
 p["name"] = "HWInfo"
 p["process_name"] = "HWiNFO64.EXE"
-p["color_temperature"] = 200
 p["priority"] = 10
 p["flash"] = False
 programs.append(p)
