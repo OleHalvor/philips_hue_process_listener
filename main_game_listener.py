@@ -3,8 +3,17 @@ import time
 import json
 import os
 import psutil
+import atexit
+from subprocess import check_output
 
-lightsToControl = ['Olli soverom lys', 'stue lys', 'inngang lys']
+def on_exit():
+    setBrightness(base_brightness)
+    setColorTemperature(base_temperature)
+    time.sleep(5)
+
+atexit.register(on_exit)
+
+lightsToControl = ['Olli soverom lys', 'stue lys', 'stue lys 2']
 
 b = Bridge("192.168.1.133")
 b.connect()
@@ -86,6 +95,7 @@ while True:
     for running_app in running_apps:
         if running_app not in found_apps:
             print("App has closed: ", running_app)
+
             running_apps.remove(running_app)
             break
     for app in found_apps:
@@ -115,17 +125,24 @@ while True:
                 print("setting base brightness",base_brightness)
                 last_set_brightness = base_brightness
                 setBrightness(base_brightness)
+
+            if "command" in highest_priority_app:
+
+                print("Executing",highest_priority_app["command"],"because of ",highest_priority_app["name"])
+                print(check_output(highest_priority_app["command"], shell=True))
+
+
             current_app = highest_priority_app
             print("new priority app", highest_priority_app)
         else:
             if current_app == highest_priority_app:
                 if "color_temperature" in highest_priority_app and not get_current_temperature() == highest_priority_app["color_temperature"]:
-                    time.sleep(1)
+                    time.sleep(5)
                     print("external temperature detected, saving new base value",get_current_temperature())
                     base_temperature = get_current_temperature()
                     base_brightness = get_current_brightness()
                 if "brightness" in highest_priority_app and not get_current_brightness() == highest_priority_app["brightness"]:
-                    time.sleep(1)
+                    time.sleep(5)
                     # Not a new app, but missmatch of brightness
                     print("external brightness detected, saving new base value",get_current_brightness())
                     base_brightness = get_current_brightness()
@@ -138,14 +155,14 @@ while True:
         current_app = "base"
 
     if len(found_apps) == 0 and last_set_brightness == base_brightness and not get_current_brightness() == last_set_brightness:
-        time.sleep(1)
+        time.sleep(5)
         print("external brightness detected, saving new base value",get_current_brightness())
         base_brightness = get_current_brightness()
     if len(found_apps) == 0 and last_set_temperature == base_temperature and not get_current_temperature() == last_set_temperature:
-        time.sleep(1)
+        time.sleep(5)
         print("external temperature detected, saving new base value",get_current_temperature())
         base_temperature = get_current_temperature()
 
-    time.sleep(1)
+    time.sleep(5)
     bri_last_iteration = get_current_brightness()
     temp_last_iteration = get_current_temperature()

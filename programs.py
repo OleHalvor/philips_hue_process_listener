@@ -13,6 +13,16 @@ p["flash"] = False
 programs.append(p)
 
 p = {}
+p["name"] = "Dark Souls 3"
+p["process_name"] = "DarkSoulsIII.exe"
+p["color_temperature"] = 454
+p["brightness"] = 50
+p["priority"] = 4
+p["flash"] = False
+p["command"] = "taskkill /F /IM dropbox.exe"
+programs.append(p)
+
+p = {}
 p["name"] = "Clone Hero"
 p["process_name"] = "Clone Hero.exe"
 p["color_temperature"] = 155
